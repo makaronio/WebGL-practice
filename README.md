@@ -1,2 +1,2 @@
-# WebGL_practice
+# WebGL-practice
 Testing different examples with WebGL
