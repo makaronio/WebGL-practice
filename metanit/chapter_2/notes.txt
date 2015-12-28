@@ -1,0 +1,19 @@
+WebGL primitives:
+    1. gl.LINES - set of lines, all lines are drawn separately
+    2. gl.LINE_STRIP - set of points connected by lines sequentially
+    3. gl.LINE_LOOP - set of points connected by lines sequentially where last point is connected to first point
+    4. gl.TRIANGLES - set of triangles
+    5. gl.TRIANGLES_STRIP - set of triangles, де вершини послідовно зєднюються в трикутники
+    6. gl.TRIANGLES_FAN - set of triangles with the same apex
+    7. gl.POINTS - set of basic points which is not connected among themselves
+
+Метод gl.drawArrays(mode, index, count) - відмальовує обєкти послідовно по вершинам в буфері вершин, де
+    mode - задає тип примітива
+    index - вказує, який номер вершини в буфері вершин буде першим для примітива
+    count - кількість вершин, які будуть використовуватися для відмалювання
+
+Метод gl.drawElements(mode, count, type, offset) - працює з буфером індексів, де
+    mode - зажає тип примітива
+    count - кількість елементів для відмалювання
+    type - тип значень в буфері індексів. Може мати значеня UNSIGNED_BYTE або UNSIGNED_SHORT
+    offset - зміщення, з якого індексу буде виконуватися відмалювання
