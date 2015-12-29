@@ -1,102 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Привет WebGL!</title>
+    <title>WebGL</title>
     <meta charset="utf-8" />
 </head>
 <body>
     <canvas id="canvas3D" width="400" height="300">Ваш браузер не поддерживает элемент canvas</canvas>
+
+    <!-- фрагментный шейдер -->
     <script id="shader-fs" type="x-shader/x-fragment">
         void main(void) {
-            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
         }
     </script>
+
+    <!-- вершинный шейдер -->
     <script id="shader-vs" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         void main(void) {
             gl_Position = vec4(aVertexPosition, 1.0);
         }
     </script>
+
     <script type="text/javascript">
         var gl;
-        var shaderProgram;
+        var shaderProgram; // программа шейдеров
         var vertexBuffer; // буфер вершин
+        var indexBuffer; //буфер индексов
 
         // установка шейдеров
         function initShaders() {
-
+            // получаем скрипты вершинного и фрагментного шейдеров
             var fragmentShader = getShader(gl.FRAGMENT_SHADER, 'shader-fs');
             var vertexShader = getShader(gl.VERTEX_SHADER, 'shader-vs');
 
+            // создаем программу шейдеров
             shaderProgram = gl.createProgram();
 
+            // прикрепляем к этой программе шейдеры
             gl.attachShader(shaderProgram, vertexShader);
             gl.attachShader(shaderProgram, fragmentShader);
 
+            //связываем контекст WebGL с программой шейдеров
             gl.linkProgram(shaderProgram);
 
             if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
                 alert("Не удалось установить шейдеры");
             }
-
+            // начинаем использовать программу шейдеров
             gl.useProgram(shaderProgram);
 
+            // установка атрибута позиции вершин
             shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
             gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
         }
 
-        // Функция создания шейдера
+        // Функция создания шейдера - запускается для обоих шейдеров
         function getShader(type,id) {
+            // получаем текст программы
             var source = document.getElementById(id).innerHTML;
 
+            // создаем шейдер
             var shader = gl.createShader(type);
 
+            // связываем шейдер с текстом
             gl.shaderSource(shader, source);
 
+            // компилируем шейдер
             gl.compileShader(shader);
 
+            // если все скомпилировалось, возвращаем из функции шейдер
             if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
                 alert("Ошибка компиляции шейдера: " + gl.getShaderInfoLog(shader));
                 gl.deleteShader(shader);
                 return null;
             }
+
             return shader;
         }
 
-        // установка вершинного буфера
+        // установка буферов вершин и индексов
         function initBuffers() {
 
-            var vertices =[
-                -0.5,  -0.5,  0.0, //m0
-                -0.5,   0.5,  0.0, //m1
-                 0.0,   0.0,  0.0, //m2
-                 0.5,   0.5,  0.0, //m3
-                 0.5,  -0.5,  0.0  //m3
-            ];
-            // установка буфера вершин
+            vertices =[ -0.5, -0.5, 0.0,
+                -0.5, 0.5, 0.0,
+                0.0, 0.0, 0.0,
+                0.5, 0.5, 0.0,
+                0.5, -0.5, 0.0];
+
+            indices = [0, 1, 1, 2, 2, 3, 3, 4];
+
             vertexBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-            // размерность
             vertexBuffer.itemSize = 3;
-            // указываем кол-во вершин - 5
-            vertexBuffer.numberOfItems=5;
+
+            indexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+            indexBuffer.numberOfItems = indices.length;
         }
 
-        // отрисовка
         function draw() {
-
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
             gl.clear(gl.COLOR_BUFFER_BIT);
-
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
                     vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-            // рисуем примитивы gl.TRIANGLE_STRIP
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertexBuffer.numberOfItems);
+            gl.drawElements(gl.LINES, indexBuffer.numberOfItems, gl.UNSIGNED_SHORT,0);
         }
 
-        window.onload = function(){
+        window.onload=function(){
 
             var canvas = document.getElementById("canvas3D");
             try {

@@ -6,25 +6,23 @@
 </head>
 <body>
     <canvas id="canvas3D" width="400" height="300">Ваш браузер не поддерживает элемент canvas</canvas>
-
     <script id="shader-fs" type="x-shader/x-fragment">
         void main(void) {
             gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
     </script>
-
     <script id="shader-vs" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         void main(void) {
             gl_Position = vec4(aVertexPosition, 1.0);
         }
     </script>
-
     <script type="text/javascript">
         var gl;
         var shaderProgram;
         var vertexBuffer; // буфер вершин
         var indexBuffer; //буфер индексов
+
         // установка шейдеров
         function initShaders() {
             var fragmentShader = getShader(gl.FRAGMENT_SHADER, 'shader-fs');
@@ -46,6 +44,7 @@
             shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
             gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
         }
+
         // Функция создания шейдера
         function getShader(type,id) {
             var source = document.getElementById(id).innerHTML;
@@ -63,10 +62,11 @@
             }
             return shader;
         }
+
         // установка буферов вершин и индексов
         function initBuffers() {
 
-            vertices =[
+            var vertices =[
                 -0.5, -0.5, 0.0,
                 -0.5,  0.5, 0.0,
                  0.0,  0.0, 0.0,
@@ -75,10 +75,12 @@
             ];
 
             indices = [0, 1, 2, 2, 4, 3];
+
             // установка буфера вершин
             vertexBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
             // размерность
             vertexBuffer.itemSize = 3;
 
@@ -89,6 +91,7 @@
             // указываем число индексов это число равно числу индексов
             indexBuffer.numberOfItems = indices.length;
         }
+
         // отрисовка
         function draw() {
 
@@ -98,13 +101,13 @@
 
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
-                    vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
             // отрисовка треугольников
             gl.drawElements(gl.TRIANGLES, indexBuffer.numberOfItems, gl.UNSIGNED_SHORT, 0);
         }
 
-        window.onload=function(){
+        window.onload = function(){
 
             var canvas = document.getElementById("canvas3D");
             try {
